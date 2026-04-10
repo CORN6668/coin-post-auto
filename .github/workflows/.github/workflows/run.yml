@@ -9,19 +9,23 @@ jobs:
   post_job:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Coze Workflow
+      - name: Trigger Coze API
         env:
-          COZE_PAT: ${{ secrets.COZE_PAT }}
-          COZE_WORKFLOW_ID: ${{ secrets.COZE_WORKFLOW_ID }}
-          COZE_SPACE_ID: ${{ secrets.COZE_SPACE_ID }}
+          PAT: ${{ secrets.COZE_PAT }}
+          WID: ${{ secrets.COZE_WORKFLOW_ID }}
+          SID: ${{ secrets.COZE_SPACE_ID }}
         run: |
-          curl -X POST "https://api.coze.com/v1/workflow/run" \
-          -H "Authorization: Bearer $COZE_PAT" \
-          -H "Content-Type: application/json" \
-          -H "Agw-Workspace-Id: $COZE_SPACE_ID" \
-          -d "{
-            \"workflow_id\": \"$COZE_WORKFLOW_ID\",
-            \"parameters\": {
-              \"USER_INPUT\": \"执行定时行情分析并发布到币安广场\"
+          cat <<EOF > payload.json
+          {
+            "workflow_id": "$WID",
+            "parameters": {
+              "USER_INPUT": "执行定时行情分析并发布到币安广场"
             }
-          }"
+          }
+          EOF
+          
+          curl -X POST "https://api.coze.com/v1/workflow/run" \
+            -H "Authorization: Bearer $PAT" \
+            -H "Content-Type: application/json" \
+            -H "Agw-Workspace-Id: $SID" \
+            -d @payload.json
