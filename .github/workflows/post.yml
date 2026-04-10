@@ -1,0 +1,31 @@
+name: Auto Post
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  post_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coze API
+        env:
+          PAT: ${{ secrets.COZE_PAT }}
+          WID: ${{ secrets.COZE_WORKFLOW_ID }}
+          SID: ${{ secrets.COZE_SPACE_ID }}
+        run: |
+          cat <<EOF > payload.json
+          {
+            "workflow_id": "$WID",
+            "parameters": {
+              "USER_INPUT": "执行定时行情分析并发布到币安广场"
+            }
+          }
+          EOF
+          
+          curl -X POST "https://api.coze.com/v1/workflow/run" \
+            -H "Authorization: Bearer $PAT" \
+            -H "Content-Type: application/json" \
+            -H "Agw-Workspace-Id: $SID" \
+            -d @payload.json
