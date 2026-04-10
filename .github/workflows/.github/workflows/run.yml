@@ -1,0 +1,20 @@
+name: Auto Post
+on:
+  workflow_dispatch: # 允许手动点按钮测试
+  schedule:
+    - cron: '0 0 * * *' # 每天北京时间早上 8 点自动运行
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install requests
+      - env:
+          COZE_PAT: ${{ secrets.COZE_PAT }}
+          COZE_WORKFLOW_ID: ${{ secrets.COZE_WORKFLOW_ID }}
+          COZE_SPACE_ID: ${{ secrets.COZE_SPACE_ID }}
+        run: python bot.py
