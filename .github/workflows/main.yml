@@ -1,0 +1,11 @@
+name: Auto Post
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+jobs:
+  post_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger Coze Workflow
+      run: curl -X POST 'https://api.coze.com/v1/workflow/stream_run' -H 'Content-Type: application/json' -d '{}'
