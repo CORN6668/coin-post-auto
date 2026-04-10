@@ -1,20 +1,27 @@
 name: Auto Post
+
 on:
-  workflow_dispatch: # 允许手动点按钮测试
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # 每天北京时间早上 8 点自动运行
+    - cron: '0 0 * * *'
 
 jobs:
-  run-bot:
+  post_job:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - run: pip install requests
-      - env:
+      - name: Trigger Coze Workflow
+        env:
           COZE_PAT: ${{ secrets.COZE_PAT }}
           COZE_WORKFLOW_ID: ${{ secrets.COZE_WORKFLOW_ID }}
           COZE_SPACE_ID: ${{ secrets.COZE_SPACE_ID }}
-        run: python bot.py
+        run: |
+          curl -X POST "https://api.coze.com/v1/workflow/run" \
+          -H "Authorization: Bearer $COZE_PAT" \
+          -H "Content-Type: application/json" \
+          -H "Agw-Workspace-Id: $COZE_SPACE_ID" \
+          -d "{
+            \"workflow_id\": \"$COZE_WORKFLOW_ID\",
+            \"parameters\": {
+              \"USER_INPUT\": \"执行定时行情分析并发布到币安广场\"
+            }
+          }"
